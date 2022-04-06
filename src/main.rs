@@ -30,10 +30,10 @@ fn main() {
     );
     println!("chart {}", now.elapsed().unwrap().as_millis());
 
-    let extent = chart.calc_lat_lon_extent();
-    println!("extent {}", now.elapsed().unwrap().as_millis());
+    /*let extent = chart.calc_lat_lon_extent();
+    println!("extent {}", now.elapsed().unwrap().as_millis());*/
 
-    let proj = chart.calc_chart_projection(extent);
+    let proj = chart.calc_chart_projection();
     println!("projection {}", now.elapsed().unwrap().as_millis());
 
     proj.safe_image("OUT.png");

@@ -1,5 +1,7 @@
 use std::fmt;
+use std::sync::Mutex;
 use min_max::{max, max_partial, min, min_partial};
+use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 use crate::{Ch1903Coord, Drawable, Image, Position2d};
 use crate::geo::extent_2d::Extent2d;
 
@@ -88,7 +90,8 @@ impl Ch1903Chart {
     }
 
 
-    pub fn calc_chart_projection(&self, extent: Extent2d) -> Drawable {
+    pub fn calc_chart_projection(&self) -> Drawable {
+        let extent = self.calc_lat_lon_extent();
         let mid_pos = extent.calc_mid_pos();
         let lon_diff = extent.max_pos.lon - extent.min_pos.lon;
         let lat_diff = extent.max_pos.lat - extent.min_pos.lat;
@@ -99,19 +102,35 @@ impl Ch1903Chart {
         let lon_inc = lon_diff / (px_width as f32 - 1.0);
         let lat_inc = lat_diff / (px_height as f32 - 1.0);
 
-        let mut drawable = Drawable::create(px_width, px_height).unwrap();
-        for y in 0..px_height {
-            for x in 0..px_width {
-                let ch_coord = Ch1903Coord::from_lon_lat(
-                    extent.min_pos.lon + (x as f32) * lon_inc,
-                    extent.min_pos.lat + (y as f32) * lat_inc
-                );
-                let pixel_color = self.get_pixel_color(ch_coord);
-                drawable.draw_point(x, px_height - y - 1, pixel_color);
-            }
-        }
+        let px_rows = self.project_pixel_rows(px_width, px_height, extent.min_pos.lon, extent.min_pos.lat, lon_inc, lat_inc);
+        let drawable = Drawable::create_with_data(px_width, px_height, px_rows).unwrap();
 
         return drawable;
+    }
+
+
+    fn project_pixel_rows(
+        &self,
+        px_width: u32,
+        px_height: u32,
+        min_pos_lon: f32,
+        min_pos_lat: f32,
+        lon_inc: f32,
+        lat_inc: f32
+    ) -> Vec<Vec<[u8; 4]>> {
+        return (0..px_height).into_par_iter().map(|y| {
+            let mut px_row: Vec<[u8; 4]> = Vec::new();
+
+            for x in 0..px_width {
+                let ch_coord = Ch1903Coord::from_lon_lat(
+                    min_pos_lon + (x as f32) * lon_inc,
+                    min_pos_lat + (y as f32) * lat_inc
+                );
+                px_row.push(self.get_pixel_color(ch_coord));
+            }
+
+            return px_row;
+        }).collect::<Vec<Vec<[u8; 4]>>>();
     }
 
 
