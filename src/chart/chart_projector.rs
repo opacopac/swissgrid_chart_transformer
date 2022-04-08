@@ -1,12 +1,13 @@
+use std::{cmp, fmt, fs};
+use std::iter::zip;
+use std::sync::Mutex;
+
 use min_max::{max, max_partial, min, min_partial};
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
-use std::fmt;
-use std::sync::Mutex;
 
 use crate::{Ch1903Chart, Ch1903Coord, Drawable, Image, Position2d};
 use crate::geo::extent_2d::Extent2d;
 use crate::geo::map_tile_coord::MapTileCoord;
-
 
 pub struct ChartProjector;
 
@@ -25,7 +26,7 @@ impl ChartProjector {
         let lat_inc = lat_diff / (px_height as f32 - 1.0);
 
         let px_rows = ChartProjector::project_pixel_rows(
-            chart,
+            &chart,
             px_width,
             px_height,
             extent.min_pos.lon,
@@ -39,7 +40,34 @@ impl ChartProjector {
     }
 
 
-    pub fn project_map_tile(chart: Ch1903Chart, zoom: u32, x: u32, y: u32) -> Drawable {
+    pub fn create_zoomlevel_tiles(chart: &Ch1903Chart, zoom: u32) {
+        let extent = ChartProjector::calc_lat_lon_extent(chart);
+        let pos_tl = Position2d::new(extent.min_pos.lon, extent.max_pos.lat);
+        let pos_br = Position2d::new(extent.max_pos.lon, extent.min_pos.lat);
+        let tile_tl = MapTileCoord::from_position(pos_tl, zoom);
+        let tile_br = MapTileCoord::from_position(pos_br, zoom);
+
+        ChartProjector::create_tiles(
+            chart,
+            zoom,
+            (min(tile_tl.x, tile_br.x), max(tile_tl.x, tile_br.x)),
+            (min(tile_tl.y, tile_br.y), max(tile_tl.y, tile_br.y)),
+        )
+    }
+
+
+    pub fn create_tiles(chart: &Ch1903Chart, zoom: u32, x_range: (u32, u32), y_range: (u32, u32)) {
+        for x in x_range.0..=x_range.1 {
+            (y_range.0..=y_range.1).into_par_iter().for_each(|y| {
+                println!("rendering tile x: {}, y: {}, z: {}", x, y, zoom);
+                let tile = ChartProjector::project_map_tile(&chart, zoom, x, y);
+                ChartProjector::save_tile(&tile, zoom, x, y);
+            })
+        }
+    }
+
+
+    pub fn project_map_tile(chart: &Ch1903Chart, zoom: u32, x: u32, y: u32) -> Drawable {
         let tile_size_px = MapTileCoord::TILE_SIZE_PX as f32;
         let tile_coord_min = MapTileCoord::new(x, y, zoom);
         let tile_coord_max = MapTileCoord::new(x + 1, y + 1, zoom);
@@ -51,7 +79,7 @@ impl ChartProjector {
         let lat_inc = (max_lat - min_lat) / tile_size_px;
 
         let px_rows = ChartProjector::project_pixel_rows(
-            chart,
+            &chart,
             MapTileCoord::TILE_SIZE_PX,
             MapTileCoord::TILE_SIZE_PX,
             min_lon,
@@ -99,7 +127,7 @@ impl ChartProjector {
 
 
     fn project_pixel_rows(
-        chart: Ch1903Chart,
+        chart: &Ch1903Chart,
         px_width: u32,
         px_height: u32,
         min_pos_lon: f32,
@@ -120,5 +148,14 @@ impl ChartProjector {
 
             return px_row;
         }).collect::<Vec<Vec<[u8; 4]>>>();
+    }
+
+
+    fn save_tile(tile: &Drawable, zoom: u32, x: u32, y: u32) {
+        let path = format!("./{}/{}", zoom, x);
+        fs::create_dir_all(&path).unwrap();
+
+        let filename = format!("{}/{}.png", &path, y);
+        tile.safe_image(&filename);
     }
 }

@@ -57,11 +57,12 @@ fn main() {
 
     println!("tl: {} br: {}", chart.get_tl_coord().to_lon_lat(), chart.get_br_coord().to_lon_lat());
 
-    let proj = ChartProjector::project_map_tile(chart, 11, 1067, 722);
+    let proj = ChartProjector::project_map_tile(&chart, 11, 1067, 722);
     println!("projection {}", now.elapsed().unwrap().as_millis());
 
     proj.safe_image("OUT_tile.png");
     println!("save {}", now.elapsed().unwrap().as_millis());
 
-    thread::sleep(time::Duration::from_secs(10));
+    ChartProjector::create_zoomlevel_tiles(&chart, 12);
+    println!("tiles {}", now.elapsed().unwrap().as_millis());
 }

@@ -11,3 +11,10 @@ impl fmt::Display for Position2d {
         write!(f, "lon: {}, lat: {}", self.lon, self.lat)
     }
 }
+
+
+impl Position2d {
+    pub fn new(lon: f32, lat: f32) -> Position2d {
+        return Position2d { lon, lat };
+    }
+}
