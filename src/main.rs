@@ -41,9 +41,9 @@ fn main() {
 
 
     let now = SystemTime::now();
-    let input_file = "luftfahrtkarten-icao_total_50_2056.png";
-    let img = Image::load_img(input_file).unwrap();
 
+    /*let input_file = "luftfahrtkarten-icao_total_50_2056.png";
+    let img = Image::load_img(input_file).unwrap();
     println!("loading {}", now.elapsed().unwrap().as_millis());
 
     let chart = Ch1903Chart::from_pos1_and_pos2(
@@ -53,9 +53,22 @@ fn main() {
         (7751, 858),
         Ch1903Coord::from_lon_lat(10.5, 47.5),
     );
+    println!("chart {}", now.elapsed().unwrap().as_millis());*/
+
+
+    let input_file = "segelflugkarte_total_30_2056.png";
+    let img = Image::load_img(input_file).unwrap();
+    println!("loading {}", now.elapsed().unwrap().as_millis());
+
+    let chart = Ch1903Chart::from_pos1_and_pos2(
+        img,
+        (333, 7399),
+        Ch1903Coord::new(490000.0, 80000.0),
+        (12000, 65),
+        Ch1903Coord::new(840000.0, 300000.0),
+    );
     println!("chart {}", now.elapsed().unwrap().as_millis());
 
-    println!("tl: {} br: {}", chart.get_tl_coord().to_lon_lat(), chart.get_br_coord().to_lon_lat());
 
     let proj = ChartProjector::project_map_tile(&chart, 11, 1067, 722);
     println!("projection {}", now.elapsed().unwrap().as_millis());
@@ -63,6 +76,6 @@ fn main() {
     proj.safe_image("OUT_tile.png");
     println!("save {}", now.elapsed().unwrap().as_millis());
 
-    ChartProjector::create_zoomlevel_tiles(&chart, 12);
+    ChartProjector::create_zoomlevel_tiles(&chart, 13);
     println!("tiles {}", now.elapsed().unwrap().as_millis());
 }
