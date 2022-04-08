@@ -1,10 +1,11 @@
 use std::fmt;
 use std::sync::Mutex;
+
 use min_max::{max, max_partial, min, min_partial};
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
+
 use crate::{Ch1903Coord, Drawable, Image, Position2d};
 use crate::geo::extent_2d::Extent2d;
-
 
 pub struct Ch1903Chart {
     image: Image,
@@ -34,6 +35,37 @@ impl fmt::Display for Ch1903Chart {
 
 impl Ch1903Chart {
     const MM_PER_INCH: f32 = 25.4; // TODO
+
+
+    pub fn from_pos1_and_pos2(
+        image: Image,
+        pixel_pos1: (u32, u32),
+        ch_coordinate1: Ch1903Coord,
+        pixel_pos2: (u32, u32),
+        ch_coordinate2: Ch1903Coord,
+    ) -> Ch1903Chart {
+        let px_diff_x = pixel_pos2.0 as f32 - pixel_pos1.0 as f32;
+        let px_diff_y = pixel_pos2.1 as f32 - pixel_pos1.1 as f32;
+        let coord_diff_e = ch_coordinate2.e - ch_coordinate1.e;
+        let coord_diff_n = ch_coordinate2.n - ch_coordinate1.n;
+        let x_coord_per_pixel = coord_diff_e / px_diff_x;
+        let y_coord_per_pixel = coord_diff_n / px_diff_y;
+
+        println!("px pos 1 x/y: {} {}", pixel_pos1.0, pixel_pos1.1);
+        println!("coord 1 e/n: {} {}", ch_coordinate1.e, ch_coordinate1.n);
+        println!("px diff x/y: {} {}", px_diff_x, px_diff_y);
+        println!("coord diff e/n: {} {}", coord_diff_e, coord_diff_n);
+        println!("coord per pixel x/y: {} {}", x_coord_per_pixel, y_coord_per_pixel);
+
+        return Ch1903Chart {
+            image,
+            pixel_pos_1: (pixel_pos1.0 as f32, pixel_pos1.1 as f32),
+            ch_1903_coord: ch_coordinate1,
+            x_coord_per_pixel,
+            y_coord_per_pixel,
+            rotation_rad: 0.0
+        }
+    }
 
 
     pub fn from_pos_and_scale(
@@ -90,65 +122,15 @@ impl Ch1903Chart {
     }
 
 
-    pub fn calc_chart_projection(&self) -> Drawable {
-        let extent = self.calc_lat_lon_extent();
-        let mid_pos = extent.calc_mid_pos();
-        let lon_diff = extent.max_pos.lon - extent.min_pos.lon;
-        let lat_diff = extent.max_pos.lat - extent.min_pos.lat;
-        let px_per_deg = self.image.width() as f32 / lon_diff;
-        let px_width = self.image.width();
-        let lat_rad = mid_pos.lat.to_radians();
-        let px_height = (lat_diff * px_per_deg / lat_rad.cos()).round() as u32;
-        let lon_inc = lon_diff / (px_width as f32 - 1.0);
-        let lat_inc = lat_diff / (px_height as f32 - 1.0);
-
-        let px_rows = self.project_pixel_rows(px_width, px_height, extent.min_pos.lon, extent.min_pos.lat, lon_inc, lat_inc);
-        let drawable = Drawable::create_with_data(px_width, px_height, px_rows).unwrap();
-
-        return drawable;
+    pub fn width(&self) -> u32 {
+        return self.image.width();
     }
 
 
-    fn project_pixel_rows(
-        &self,
-        px_width: u32,
-        px_height: u32,
-        min_pos_lon: f32,
-        min_pos_lat: f32,
-        lon_inc: f32,
-        lat_inc: f32
-    ) -> Vec<Vec<[u8; 4]>> {
-        return (0..px_height).into_par_iter().map(|y| {
-            let mut px_row: Vec<[u8; 4]> = Vec::new();
-
-            for x in 0..px_width {
-                let ch_coord = Ch1903Coord::from_lon_lat(
-                    min_pos_lon + (x as f32) * lon_inc,
-                    min_pos_lat + (y as f32) * lat_inc
-                );
-                px_row.push(self.get_pixel_color(ch_coord));
-            }
-
-            return px_row;
-        }).collect::<Vec<Vec<[u8; 4]>>>();
+    pub fn height(&self) -> u32 {
+        return self.image.height();
     }
 
-
-    fn get_pixel_color(&self, ch_coord: Ch1903Coord) -> [u8; 4] {
-        let mut px_rel_x = (ch_coord.e - self.ch_1903_coord.e) / self.x_coord_per_pixel;
-        let mut px_rel_y = (ch_coord.n - self.ch_1903_coord.n) / self.y_coord_per_pixel;
-
-        if self.rotation_rad != 0.0 {
-            let px_rel_x2 = px_rel_x * self.rotation_rad.cos() - px_rel_y * self.rotation_rad.sin();
-            px_rel_y = px_rel_x * self.rotation_rad.sin() + px_rel_y * self.rotation_rad.cos();
-            px_rel_x = px_rel_x2;
-        }
-
-        px_rel_x += self.pixel_pos_1.0 as f32;
-        px_rel_y += self.pixel_pos_1.1 as f32;
-
-        return self.image.interpolate_pixel_color(px_rel_x, px_rel_y);
-    }
 
     pub fn get_tl_coord(&self) -> Ch1903Coord {
         return self.calc_coord_by_pixel(0, 0);
@@ -157,39 +139,6 @@ impl Ch1903Chart {
 
     pub fn get_br_coord(&self) -> Ch1903Coord {
         return self.calc_coord_by_pixel(self.image.width() - 1, self.image.height() - 1);
-    }
-
-
-    pub fn calc_lat_lon_extent(&self) -> Extent2d {
-        let pos0 = self.get_tl_coord().to_lon_lat();
-        let mut min_lon = pos0.lon;
-        let mut min_lat = pos0.lat;
-        let mut max_lon = pos0.lon;
-        let mut max_lat = pos0.lat;
-
-
-        for x in 0..self.image.width() {
-            let pos1 = self.calc_coord_by_pixel(x, 0).to_lon_lat();
-            let pos2 = self.calc_coord_by_pixel(x, self.image.height() - 1).to_lon_lat();
-            min_lon = min_partial!(pos1.lon, pos2.lon, min_lon);
-            min_lat = min_partial!(pos1.lat, pos2.lat, min_lat);
-            max_lon = max_partial!(pos1.lon, pos2.lon, max_lon);
-            max_lat = max_partial!(pos1.lat, pos2.lat, max_lat);
-        }
-
-        for y in 0..self.image.height() {
-            let pos1 = self.calc_coord_by_pixel(0, y).to_lon_lat();
-            let pos2 = self.calc_coord_by_pixel(self.image.width() - 1, y).to_lon_lat();
-            min_lon = min_partial!(pos1.lon, pos2.lon, min_lon);
-            min_lat = min_partial!(pos1.lat, pos2.lat, min_lat);
-            max_lon = max_partial!(pos1.lon, pos2.lon, max_lon);
-            max_lat = max_partial!(pos1.lat, pos2.lat, max_lat);
-        }
-
-        return Extent2d {
-            min_pos: Position2d { lon: min_lon, lat: min_lat },
-            max_pos: Position2d { lon: max_lon, lat: max_lat }
-        };
     }
 
 
@@ -208,5 +157,22 @@ impl Ch1903Chart {
         let ch_coord_n = px_rel_y * self.y_coord_per_pixel + self.ch_1903_coord.n;
 
         return Ch1903Coord { e: ch_coord_e, n: ch_coord_n };
+    }
+
+
+    pub fn get_pixel_color(&self, ch_coord: Ch1903Coord) -> [u8; 4] {
+        let mut px_rel_x = (ch_coord.e - self.ch_1903_coord.e) / self.x_coord_per_pixel;
+        let mut px_rel_y = (ch_coord.n - self.ch_1903_coord.n) / self.y_coord_per_pixel;
+
+        if self.rotation_rad != 0.0 {
+            let px_rel_x2 = px_rel_x * self.rotation_rad.cos() - px_rel_y * self.rotation_rad.sin();
+            px_rel_y = px_rel_x * self.rotation_rad.sin() + px_rel_y * self.rotation_rad.cos();
+            px_rel_x = px_rel_x2;
+        }
+
+        px_rel_x += self.pixel_pos_1.0 as f32;
+        px_rel_y += self.pixel_pos_1.1 as f32;
+
+        return self.image.interpolate_pixel_color(px_rel_x, px_rel_y);
     }
 }

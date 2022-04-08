@@ -16,11 +16,16 @@ impl fmt::Display for Ch1903Coord {
 
 
 impl Ch1903Coord {
-    pub fn to_lon_lat(&self) -> Position2d {
-        let lon = Ch1903Coord::ch_to_wgs_long(self.e, self.n);
-        let lat = Ch1903Coord::ch_to_wgs_lat(self.e, self.n);
+    pub fn new(e: f32, n: f32) -> Ch1903Coord {
+        return Ch1903Coord { e, n };
+    }
 
-        return Position2d { lon, lat };
+
+    pub fn from_pos2d(pos2d: Position2d) -> Ch1903Coord {
+        let e = Ch1903Coord::wgs_to_ch_y(pos2d.lat, pos2d.lon);
+        let n = Ch1903Coord::wgs_to_ch_x(pos2d.lat, pos2d.lon);
+
+        return Ch1903Coord { e, n };
     }
 
 
@@ -32,11 +37,11 @@ impl Ch1903Coord {
     }
 
 
-    pub fn from_pos2d(pos2d: Position2d) -> Ch1903Coord {
-        let e = Ch1903Coord::wgs_to_ch_y(pos2d.lat, pos2d.lon);
-        let n = Ch1903Coord::wgs_to_ch_x(pos2d.lat, pos2d.lon);
+    pub fn to_lon_lat(&self) -> Position2d {
+        let lon = Ch1903Coord::ch_to_wgs_long(self.e, self.n);
+        let lat = Ch1903Coord::ch_to_wgs_lat(self.e, self.n);
 
-        return Ch1903Coord { e, n };
+        return Position2d { lon, lat };
     }
 
 
