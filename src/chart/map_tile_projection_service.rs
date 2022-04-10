@@ -21,8 +21,6 @@ impl MapTileProjectionService {
     ) {
         let extent = CommonChartProjectionService::calc_lat_lon_extent(chart);
 
-        println!("{}", extent);
-
         let pos_tl = Position2d::new(extent.min_pos.lon, extent.max_pos.lat);
         let pos_br = Position2d::new(extent.max_pos.lon, extent.min_pos.lat);
 
@@ -34,7 +32,7 @@ impl MapTileProjectionService {
 
             for x in x_range.0..=x_range.1 {
                 (y_range.0..=y_range.1).into_par_iter().for_each(|y| {
-                    println!("rendering tile x: {}, y: {}, z: {}", x, y, zoom);
+                    //println!("rendering tile x: {}, y: {}, z: {}", x, y, zoom);
                     let tile = MapTileProjectionService::create_single_tile(&chart, zoom, x, y);
                     MapTileProjectionService::save_tile(&tile, zoom, x, y, base_path);
                 })

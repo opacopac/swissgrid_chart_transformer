@@ -48,16 +48,11 @@ fn main() {
     let geo_reg2 = WorldFileService::read("OUT.pgw");*/
 
 
-    /*let input_file = "luftfahrtkarten-icao_total_50_2056.png";
+    /*let input_file = "luftfahrtkarten-icao_total_50_2056.tif";
     let img = Image::load_img(input_file).unwrap();
     println!("loading {}", now.elapsed().unwrap().as_millis());
 
-    let geo_reg = GeoReg::from_pos1_pos2_rot(
-        (135.0, 4246.0),
-        Ch1903Coord::from_lon_lat(5.5, 46.0).get_x_y(),
-        (7751.0, 858.0),
-        Ch1903Coord::from_lon_lat(10.5, 47.5).get_x_y(),
-    );
+    let geo_reg = WorldFileService::read("luftfahrtkarten-icao_total_50_2056.tfw");
     let chart = Ch1903GeoRegChart::new(img, geo_reg);
     println!("chart {}", now.elapsed().unwrap().as_millis());
 
@@ -70,12 +65,7 @@ fn main() {
     let img = Image::load_img(input_file).unwrap();
     println!("loading {}", now.elapsed().unwrap().as_millis());
 
-    let geo_reg = GeoReg::from_pos1_pos2_rot(
-        (333.0, 7399.0),
-        Ch1903Coord::new(490000.0, 80000.0).get_x_y(),
-        (12000.0, 65.0),
-        Ch1903Coord::new(840000.0, 300000.0).get_x_y(),
-    );
+    let geo_reg = WorldFileService::read("segelflugkarte_total_30_2056.tfw");
     let chart = Ch1903GeoRegChart::new(img, geo_reg);
     println!("chart {}", now.elapsed().unwrap().as_millis());
 
