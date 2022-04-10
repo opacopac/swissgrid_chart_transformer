@@ -1,5 +1,6 @@
 use std::fmt;
-use crate::Position2d;
+use crate::geo::coord::Coord;
+use crate::geo::position_2d::Position2d;
 
 
 pub struct Ch1903Coord {
@@ -11,6 +12,13 @@ pub struct Ch1903Coord {
 impl fmt::Display for Ch1903Coord {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "e: {}, n: {}", self.e, self.n)
+    }
+}
+
+
+impl Coord for Ch1903Coord {
+    fn get_x_y(&self) -> (f32, f32) {
+        return (self.e, self.n);
     }
 }
 

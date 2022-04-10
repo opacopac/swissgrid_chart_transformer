@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 use std::fmt;
-use crate::Position2d;
 
+use crate::Position2d;
 
 pub struct MapTileCoord {
     pub x: u32,
@@ -26,7 +26,7 @@ impl MapTileCoord {
     }
 
 
-    pub fn from_position(pos: Position2d, zoom: u32) -> MapTileCoord {
+    pub fn from_position(pos: &Position2d, zoom: u32) -> MapTileCoord {
         let pow = 2_u32.pow(zoom) as f32;
         let x_tile = ((pos.lon + 180.0) / 360.0 * pow).floor() as u32;
         let y_tile = ((1.0 - (pos.lat.to_radians().tan() + 1.0 / pos.lat.to_radians().cos()).ln() / PI) / 2.0 * pow).floor() as u32;
