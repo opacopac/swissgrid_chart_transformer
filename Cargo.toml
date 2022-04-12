@@ -28,3 +28,5 @@ thiserror = "1.0.30"
 min-max = "0.1.8"
 rayon = "1.5.1"
 assert_approx_eq = "1.1.0"
+clap = { version = "3.1.8", features = ["derive"] }
+simple-error = "0.2.3"

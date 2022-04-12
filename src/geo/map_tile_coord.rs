@@ -3,17 +3,11 @@ use std::fmt;
 
 use crate::Position2d;
 
+#[derive(Debug)]
 pub struct MapTileCoord {
     pub x: u32,
     pub y: u32,
     pub zoom: u32
-}
-
-
-impl fmt::Display for MapTileCoord {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "x: {}, y: {}, z: {}", self.x, self.y, self.zoom)
-    }
 }
 
 

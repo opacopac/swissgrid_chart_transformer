@@ -3,16 +3,10 @@ use crate::geo::coord::Coord;
 use crate::geo::position_2d::Position2d;
 
 
+#[derive(Debug)]
 pub struct Ch1903Coord {
     pub e: f32,
     pub n: f32
-}
-
-
-impl fmt::Display for Ch1903Coord {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "e: {}, n: {}", self.e, self.n)
-    }
 }
 
 

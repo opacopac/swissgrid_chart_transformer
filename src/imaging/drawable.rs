@@ -17,15 +17,9 @@ impl Drawable {
 
 
     pub fn create_with_data(width: u32, height: u32, px_rows: Vec<Vec<[u8; 4]>>) -> Result<Drawable, ImagingError> {
-        let drawable_result = Drawable::create_empty(width, height);
-
-        if drawable_result.is_err() {
-            return Err(drawable_result.err().unwrap());
-        }
-
-        let mut drawable = drawable_result.unwrap();
-
+        let mut drawable = Drawable::create_empty(width, height)?;
         let mut y = 0;
+
         for px_row in px_rows {
             let mut x = 0;
             for px in px_row {

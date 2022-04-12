@@ -3,6 +3,7 @@ use crate::{Ch1903Coord, Position2d};
 use crate::geo::coord::Coord;
 
 
+#[derive(Debug)]
 pub struct GeoReg {
     pub x_coord_per_px_width: f32,
     pub y_coord_per_px_width: f32,
@@ -10,22 +11,6 @@ pub struct GeoReg {
     pub y_coord_per_px_height: f32,
     pub coord_tl: (f32, f32),
     det: f32,
-}
-
-
-impl fmt::Display for GeoReg {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "x/px width: {}, y/px width: {}, x/px height: {}, y/px height: {}\ncoord tl: {}, {}",
-            self.x_coord_per_px_width,
-            self.y_coord_per_px_width,
-            self.x_coord_per_px_height,
-            self.y_coord_per_px_height,
-            self.coord_tl.0,
-            self.coord_tl.1
-        )
-    }
 }
 
 

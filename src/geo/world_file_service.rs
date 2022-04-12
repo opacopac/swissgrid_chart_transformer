@@ -1,40 +1,52 @@
-use std::fs;
+use std::{fs, io};
+use std::error::Error;
+
+use simple_error::bail;
+
 use crate::geo::geo_reg::GeoReg;
+use crate::get_geo_reg;
 
 pub struct WorldFileService;
 
 
 impl WorldFileService {
-    pub fn read(filename: &str) -> GeoReg {
-        let file_content = fs::read_to_string(filename).unwrap(); // TODO
+    pub fn read(filename: &str) -> Result<GeoReg, Box<dyn Error>> {
+        let file_content = fs::read_to_string(filename)?;
+        let geo_reg = WorldFileService::parse_file_content(file_content)?;
 
-        return WorldFileService::parse_file_content(file_content);
+        return Ok(geo_reg);
     }
 
 
     pub fn save(geo_reg: GeoReg, filename: &str) {
         let content = WorldFileService::create_file_content(geo_reg);
-
-        fs::write(filename, content); // TODO
+        fs::write(filename, content);
     }
 
 
-    fn parse_file_content(file_conent: String) -> GeoReg {
-        let mut lines = file_conent.lines();
-        let x_coord_per_px_width = lines.next().unwrap().parse::<f32>().unwrap(); // TODO
-        let y_coord_per_px_width = lines.next().unwrap().parse::<f32>().unwrap();
-        let x_coord_per_px_height = lines.next().unwrap().parse::<f32>().unwrap();
-        let y_coord_per_px_height = lines.next().unwrap().parse::<f32>().unwrap();
-        let x_coord_tl = lines.next().unwrap().parse::<f32>().unwrap();
-        let y_coord_tl = lines.next().unwrap().parse::<f32>().unwrap();
+    fn parse_file_content(file_conent: String) -> Result<GeoReg, Box<dyn Error>> {
+        let lines: Vec<_> = file_conent.lines().collect();
 
-        return GeoReg::new(
+        if lines.len() < 6 {
+            bail!("invalid world file format");
+        }
+
+        let x_coord_per_px_width = lines[0].parse::<f32>()?;
+        let y_coord_per_px_width = lines[1].parse::<f32>()?;
+        let x_coord_per_px_height = lines[2].parse::<f32>()?;
+        let y_coord_per_px_height = lines[3].parse::<f32>()?;
+        let x_coord_tl = lines[4].parse::<f32>()?;
+        let y_coord_tl = lines[5].parse::<f32>()?;
+        
+        let geo_reg = GeoReg::new(
             x_coord_per_px_width,
             y_coord_per_px_width,
             x_coord_per_px_height,
             y_coord_per_px_height,
             (x_coord_tl, y_coord_tl)
         );
+        
+        return Ok(geo_reg);
     }
 
 

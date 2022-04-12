@@ -2,16 +2,10 @@ use std::fmt;
 use crate::geo::position_2d::Position2d;
 
 
+#[derive(Debug)]
 pub struct Extent2d {
     pub min_pos: Position2d,
     pub max_pos: Position2d
-}
-
-
-impl fmt::Display for Extent2d {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "min_pos: {}, max_pos: {}", self.min_pos, self.max_pos)
-    }
 }
 
 
