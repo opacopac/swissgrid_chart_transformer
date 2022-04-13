@@ -2,46 +2,6 @@ use std::str::FromStr;
 
 use clap::{ArgEnum, Parser};
 
-#[derive(clap::ArgEnum, Clone, Debug)]
-pub enum ActionArg {
-    Chart,
-    Tiles
-}
-
-impl FromStr for ActionArg {
-    type Err = String;
-    fn from_str(action: &str) -> Result<Self, Self::Err> {
-        match action {
-            "chart" => Ok(ActionArg::Chart),
-            "tiles" => Ok(ActionArg::Tiles),
-            _ => Err("unknown action".to_string()),
-        }
-    }
-}
-
-
-#[derive(clap::ArgEnum, Clone, Debug)]
-pub enum GeoRegMode {
-    WorldFile,
-    Pos1Pos2Rot,
-    Pos1Pos2Stretch,
-    Pos1SizeScale
-}
-
-
-impl FromStr for GeoRegMode {
-    type Err = String;
-    fn from_str(action: &str) -> Result<Self, Self::Err> {
-        match action {
-            "world_file" => Ok(GeoRegMode::WorldFile),
-            "pos1_pos2_rot" => Ok(GeoRegMode::Pos1Pos2Rot),
-            "pos1_pos2_stretch" => Ok(GeoRegMode::Pos1Pos2Stretch),
-            "pos1_size_scale" => Ok(GeoRegMode::Pos1SizeScale),
-            _ => Err("unknown action".to_string()),
-        }
-    }
-}
-
 
 /// image chart transformer from swiss grid projection (LV03) to web mercator projection
 #[derive(Parser, Debug)]
@@ -51,21 +11,25 @@ pub struct Args {
     #[clap(short, long)]
     pub chart: String,
 
-    /// geo registration mode [ world_file | pos1_pos2_rot | pos1_pos2_stretch | pos1_size_scale]
-    #[clap(short = 'g', long)]
-    pub geo_reg_mode: GeoRegMode,
+    /// 'world_file': filename of world file (e.g. chart.tfw)
+    #[clap(short, long)]
+    pub world_file: Option<String>,
 
-    /// geo registration value
-    ///  mode 'world_file': filename of world file (e.g. chart.tfw)
-    ///  mode 'pos1_pos2_rot': TBD (e.g. 10,10,7.0,47.0,20,20,8.0,46.0)
-    ///  mode 'pos1_pos2_stretch': TBD
-    ///  mode 'pos1_size_scale': TBD
-    #[clap(short = 'w', long)]
-    pub geo_reg_value: String,
+    /// pos1_pos2_rot: TBD (e.g. 10,10,7.0,47.0,20,20,8.0,46.0)
+    #[clap(short = 'r', long, number_of_values = 8)]
+    pub pos1_pos2_rot: Option<Vec<f32>>,
 
-    /// action to perform [chart | tiles]
-    #[clap(short, long, default_value = "chart")]
-    pub action: ActionArg,
+    /// pos1_pos2_stretch: TBD
+    #[clap(short = 's', long, number_of_values = 8)]
+    pub pos1_pos2_stretch: Option<Vec<f32>>,
+
+    /// pos1_size_scale: TBD
+    #[clap(short = 't', long, number_of_values = 6)]
+    pub pos1_size_scale: Option<Vec<f32>>,
+
+    /// zoom levels for map tiles (e.g. 0,10)
+    #[clap(short, long, number_of_values = 2)]
+    pub zoom_range: Option<Vec<u8>>,
 
     /// output chart file or map tiles base directory
     #[clap(short, long)]

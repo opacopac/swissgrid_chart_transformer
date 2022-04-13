@@ -41,15 +41,12 @@ impl GeoReg {
     pub fn from_pos1_size_scale(
         px1: (f32, f32),
         coord1: (f32, f32),
-        img_size_px: (f32, f32),
         chart_scale: f32,
         resolution_dpi: f32
     ) -> GeoReg {
-        let mm_per_inch = 25.4;
-        let width_mm = img_size_px.0 / resolution_dpi * mm_per_inch;
-        let height_mm = img_size_px.1 / resolution_dpi * mm_per_inch;
-        let x_coord_per_px = width_mm / img_size_px.0 / 1000.0 * chart_scale;
-        let y_coord_per_px = -height_mm / img_size_px.1 / 1000.0 * chart_scale;
+        const MM_PER_INCH: f32 = 25.4;
+        let x_coord_per_px = MM_PER_INCH / resolution_dpi / 1000.0 * chart_scale;
+        let y_coord_per_px = -MM_PER_INCH / resolution_dpi / 1000.0 * chart_scale;
         let x_coord_tl = coord1.0 - px1.0 * x_coord_per_px;
         let y_coord_tl = coord1.1 - px1.1 * y_coord_per_px;
 
