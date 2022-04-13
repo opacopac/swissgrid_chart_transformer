@@ -1,9 +1,5 @@
-use std::error::Error;
-use image::{EncodableLayout, ImageResult, io};
 use crate::imaging::{COLOR_TRANSPARENT, NUM_COLOR_VALUES};
 use crate::imaging::error::ImagingError;
-
-
 
 pub struct Image {
     pixel_values: Vec<u8>,

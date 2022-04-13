@@ -1,10 +1,9 @@
-use std::{fs, io};
 use std::error::Error;
+use std::fs;
 
 use simple_error::bail;
 
 use crate::geo::geo_reg::GeoReg;
-use crate::get_geo_reg;
 
 pub struct WorldFileService;
 
@@ -20,7 +19,7 @@ impl WorldFileService {
 
     pub fn save(geo_reg: GeoReg, filename: &str) {
         let content = WorldFileService::create_file_content(geo_reg);
-        fs::write(filename, content);
+        let result = fs::write(filename, content);
     }
 
 

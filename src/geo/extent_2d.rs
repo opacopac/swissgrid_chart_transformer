@@ -1,6 +1,4 @@
-use std::fmt;
 use crate::geo::position_2d::Position2d;
-
 
 #[derive(Debug)]
 pub struct Extent2d {

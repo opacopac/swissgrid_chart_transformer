@@ -1,8 +1,3 @@
-use std::fmt;
-use crate::{Ch1903Coord, Position2d};
-use crate::geo::coord::Coord;
-
-
 #[derive(Debug)]
 pub struct GeoReg {
     pub x_coord_per_px_width: f32,
@@ -15,9 +10,6 @@ pub struct GeoReg {
 
 
 impl GeoReg {
-    const MM_PER_INCH: f32 = 25.4; // TODO
-
-
     pub fn new(
         x_coord_per_px_width: f32,
         y_coord_per_px_width: f32,

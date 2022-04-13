@@ -1,13 +1,8 @@
-use std::{cmp, fmt, fs};
-use std::iter::zip;
-use std::sync::Mutex;
-
 use min_max::{max, max_partial, min, min_partial};
-use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
-use crate::{Ch1903Coord, Ch1903GeoRegChart, Drawable, Image, Position2d};
+use crate::{Ch1903Coord, Ch1903GeoRegChart, Position2d};
 use crate::geo::extent_2d::Extent2d;
-use crate::geo::map_tile_coord::MapTileCoord;
 
 pub struct CommonChartProjectionService;
 

@@ -1,9 +1,7 @@
-use std::path::Iter;
 use image::ColorType;
-use crate::Image;
+
 use crate::imaging::error::ImagingError;
 use crate::imaging::NUM_COLOR_VALUES;
-
 
 pub struct Drawable {
     color_values: Vec<u8>,

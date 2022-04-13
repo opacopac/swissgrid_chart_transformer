@@ -8,7 +8,6 @@ use crate::chart::ch_1903_georeg_chart::Ch1903GeoRegChart;
 use crate::chart::map_tile_projection_service::MapTileProjectionService;
 use crate::chart::single_chart_projection_service::SingleChartProjectionService;
 use crate::geo::ch_1903_coord::Ch1903Coord;
-use crate::geo::coord::Coord;
 use crate::geo::geo_reg::GeoReg;
 use crate::geo::position_2d::Position2d;
 use crate::geo::world_file_service::WorldFileService;
@@ -30,7 +29,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     match args.zoom_range {
         None => {
             let output = SingleChartProjectionService::create_chart(&chart)?;
-            output.drawable.safe_image(&args.output);
+            let result = output.drawable.safe_image(&args.output);
+
+            let geo_reg_file = format!("{}.tfw", &args.output); // TODO
+            WorldFileService::save(output.geo_reg, &geo_reg_file);
         },
         Some(zoom_levels) => {
             MapTileProjectionService::create_all_tiles(

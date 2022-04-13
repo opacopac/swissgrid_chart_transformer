@@ -1,5 +1,4 @@
 use crate::geo::geo_reg::GeoReg;
-use crate::geo::position_2d::Position2d;
 use crate::imaging::drawable::Drawable;
 
 

@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use clap::{ArgEnum, Parser};
+use clap::Parser;
 
 
 /// image chart transformer from swiss grid projection (LV03) to web mercator projection

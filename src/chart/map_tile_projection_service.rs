@@ -1,13 +1,10 @@
-use std::{cmp, fmt, fs};
-use std::iter::zip;
-use std::sync::Mutex;
+use std::fs;
 
-use min_max::{max, max_partial, min, min_partial};
-use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
+use min_max::{max, min};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
-use crate::{Ch1903Coord, Ch1903GeoRegChart, Drawable, Image, Position2d};
+use crate::{Ch1903GeoRegChart, Drawable, Position2d};
 use crate::chart::common_chart_projection_service::CommonChartProjectionService;
-use crate::geo::extent_2d::Extent2d;
 use crate::geo::map_tile_coord::MapTileCoord;
 
 pub struct MapTileProjectionService;
@@ -83,6 +80,6 @@ impl MapTileProjectionService {
         fs::create_dir_all(&path).unwrap();
 
         let filename = format!("{}/{}.png", &path, y);
-        tile.safe_image(&filename);
+        let result = tile.safe_image(&filename);
     }
 }

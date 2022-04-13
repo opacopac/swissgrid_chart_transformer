@@ -1,7 +1,5 @@
-use std::fmt;
 use crate::geo::coord::Coord;
 use crate::geo::position_2d::Position2d;
-
 
 #[derive(Debug)]
 pub struct Ch1903Coord {
