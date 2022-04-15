@@ -80,6 +80,6 @@ impl MapTileProjectionService {
         fs::create_dir_all(&path).unwrap();
 
         let filename = format!("{}/{}.png", &path, y);
-        let result = tile.safe_image(&filename);
+        let _result = tile.safe_image(&filename);
     }
 }

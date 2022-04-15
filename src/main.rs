@@ -29,9 +29,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     match args.zoom_range {
         None => {
             let output = SingleChartProjectionService::create_chart(&chart)?;
-            let result = output.drawable.safe_image(&args.output);
+            let _result = output.drawable.safe_image(&args.output);
 
-            let geo_reg_file = format!("{}.tfw", &args.output); // TODO
+            let geo_reg_file = WorldFileService::derive_file_name(&args.output)?;
             WorldFileService::save(output.geo_reg, &geo_reg_file);
         },
         Some(zoom_levels) => {

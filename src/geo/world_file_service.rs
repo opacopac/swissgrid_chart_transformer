@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs;
+use std::path::Path;
 
 use simple_error::bail;
 
@@ -19,7 +20,25 @@ impl WorldFileService {
 
     pub fn save(geo_reg: GeoReg, filename: &str) {
         let content = WorldFileService::create_file_content(geo_reg);
-        let result = fs::write(filename, content);
+        let _result = fs::write(filename, content);
+    }
+
+
+    pub fn derive_file_name(image_file: &str) -> Result<String, Box<dyn Error>> {
+        let path = Path::new(image_file);
+        let new_ext = match path.extension() {
+            Some(x) => {
+                let first_char_of_ext: String = match x.to_str() {
+                    Some(y) => y.chars().take(1).collect(),
+                    None => "t".to_string()
+                };
+                (first_char_of_ext + "fw").to_string()
+            },
+            None => "tfw".to_string()
+        };
+        let world_file_name = path.with_extension(new_ext).to_str().unwrap().to_string();
+
+        return Ok(world_file_name);
     }
 
 
