@@ -33,9 +33,9 @@ impl SingleChartProjectionService {
         let drawable = Drawable::create_with_data(px_width, px_height, px_rows)?;
         let geo_reg = GeoReg::new(
             lon_inc,
-            lat_inc,
             0.0,
             0.0,
+            -lat_inc,
             (extent.min_pos.lon, extent.max_pos.lat)
         );
 
