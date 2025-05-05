@@ -8,27 +8,27 @@ Chart Transformer (Reprojection) from CH1903 (LV03) to WSG84.
 ### Syntax
  * `swissgrid_chart_transformer [OPTIONS] --chart \<CHART_FILE\> --output \<OUTPUT_FILE\>`
  * Options:
-   * `-r` for two reference points & rotation _(Format: \<pixel1_x\> \<pixel1_y\> \<lon1\> \<lat1\> \<pixel2_x\> \<pixel2_y\> \<lon2\> \<lat2\>)_
+   * `-r` for two reference points & rotation _(Format: \<pixel1_x\> \<pixel1_y\> \<coord1_e\> \<coord_n\> \<pixel2_x\> \<pixel2_y\> \<coord2_e\> \<coord2_n\>)_
    * `-s` for two reference points & stretch _(Format: same as above)_
-   * `-t` for one reference point & scale & DPI _(Format: \<pixel1_x\> \<pixel1_y\> \<lon1\> \<lat1\> \<scale\> \<dpi\>)_
+   * `-t` for one reference point & scale & DPI _(Format: \<pixel_x\> \<pixel_y\> \<coord_e\> \<coord_n\> \<scale\> \<dpi\>)_
 
 #### Example: Two Reference Points & Rotation
 ```bash
-swissgrid_chart_transformer -r 41 191 7.490458 46.919443 194 358 7.494211 46.916595 \
+swissgrid_chart_transformer -r 41 191 600000 200000 194 358 605000 204000 \
 --chart chart_in.png \
 --output chart_out.png
 ```
 
 #### Example: Two Reference Points & Stretch
 ```bash
-swissgrid_chart_transformer -s 41 191 7.490458 46.919443 194 358 7.494211 46.916595 \
+swissgrid_chart_transformer -s 41 191 600000 200000 194 358 605000 204000 \
 --chart chart_in.png \
 --outputchart_out.png
 ```
 
 #### Example: One Reference Points & Scale (1:10000) & DPI (200)
 ```bash
-swissgrid_chart_transformer -t 41 191 7.490458 46.919443 10000 200 \
+swissgrid_chart_transformer -t 41 191 600000 200000 10000 200 \
 --chart chart_in.png \
 --output chart_out.png
 ```
