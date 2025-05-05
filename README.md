@@ -1,9 +1,16 @@
 # Swissgrid Chart Transformer
 
-Chart Transformer from CH1903 (LV03) to WSG84
+Chart Transformer (Reprojection) from CH1903 (LV03) to WSG84.
+
 
 ## Command Line Usage
-TBD
+
+### Example: Two Reference Points & Rotation
+```bash
+swissgrid_chart_transformer -r 41 191 7.490458 46.919443 194 358 7.494211 46.916595 \
+--chart /path/to/input/chart_in.png \
+--output /path/to/output/chart_out.png
+```
 
 
 ## Instructions for Developers
