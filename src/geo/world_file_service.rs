@@ -26,19 +26,16 @@ impl WorldFileService {
 
     pub fn derive_file_name(image_file: &str) -> Result<String, Box<dyn Error>> {
         let path = Path::new(image_file);
-        let new_ext = match path.extension() {
-            Some(x) => {
-                let first_char_of_ext: String = match x.to_str() {
-                    Some(y) => y.chars().take(1).collect(),
-                    None => "t".to_string()
-                };
-                (first_char_of_ext + "fw").to_string()
-            },
-            None => "tfw".to_string()
+        let new_ext = match path.extension().and_then(|x| x.to_str()) {
+            Some(ext) => format!("{}w", ext),
+            None => "wld".to_string(),
         };
-        let world_file_name = path.with_extension(new_ext).to_str().unwrap().to_string();
+        let world_file_name = path.with_extension(new_ext)
+            .to_str()
+            .ok_or("Invalid UTF-8 in path")?
+            .to_string();
 
-        return Ok(world_file_name);
+        Ok(world_file_name)
     }
 
 
