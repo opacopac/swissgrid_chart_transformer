@@ -37,18 +37,22 @@ swissgrid_chart_transformer -t 41 191 600000 200000 10000 200 \
 
 ## Instructions for Developers
 
-### Compiling the project locally
+### Building Locally
+1. Install Rust: https://www.rust-lang.org/tools/install
+2. Build the project:
 ```bash
 cargo build --release
 ```
 
 ### Using Docker
-1. Build the image
+1. Build the image:
 ```bash
 docker build -t swissgrid_chart_transformer .
 ```
 
-2. Run the container
+2. Run the container:
 ```bash
 docker run -it --rm --name swissgrid_chart_transformer swissgrid_chart_transformer
 ```
+ The files can be found in `/usr/src/swissgrid_chart_transformer/` inside the container.
+ 
